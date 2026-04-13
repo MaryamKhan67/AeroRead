@@ -165,6 +165,11 @@ function App() {
             currentPage={currentPage}
             totalPages={readingData?.metadata?.page_count || 1}
             onPageChange={handlePageChange}
+            onOpenTOC={() => setIsSidebarOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+            onToggleSearch={() => setIsSearchActive(!isSearchActive)}
+            isSearchActive={isSearchActive}
+            onHome={() => setReadingData(null)}
           />
 
           <SettingsDrawer
