@@ -163,7 +163,7 @@ function App() {
             readingMode={readingMode}
             setReadingMode={setReadingMode}
             currentPage={currentPage}
-            totalPages={data?.metadata?.page_count || readingData?.metadata?.page_count || 1}
+            totalPages={readingData?.metadata?.page_count || 1}
             onPageChange={handlePageChange}
           />
 
