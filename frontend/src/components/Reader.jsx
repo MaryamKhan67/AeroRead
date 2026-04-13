@@ -195,56 +195,62 @@ export default function Reader({
 
             <main className="flex-grow">
                 {readingMode === 'scroll' ? (
-                    <div className="max-w-3xl mx-auto space-y-12 font-serif-premium">
+                    <div className="max-w-4xl mx-auto space-y-16 pb-32">
                         {pages.map((page) => (
-                            <div key={page.number} className="relative pt-12">
-                                {/* Page Marker */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center gap-4 w-full opacity-20 pointer-events-none">
-                                    <div className="flex-grow h-px bg-current"></div>
-                                    <span className="text-[10px] uppercase tracking-[0.5em] font-bold whitespace-nowrap">Page {page.number}</span>
-                                    <div className="flex-grow h-px bg-current"></div>
+                            <div key={page.number} className="page-sheet rounded-[2rem] md:rounded-[3rem] p-10 md:p-20 relative overflow-hidden min-h-[600px]">
+                                {/* Page Marker Overlay */}
+                                <div className="absolute top-8 right-12 opacity-20 text-[10px] uppercase tracking-[0.3em] font-bold pointer-events-none">
+                                    Page {page.number}
                                 </div>
 
-                                <div className="space-y-8 text-justify">
+                                <div className="space-y-6">
                                     {page.blocks.map((block) => {
                                         const isBookmarked = progress?.bookmarks?.find(b => b.id === block.id);
                                         if (block.type === 'heading') {
                                             return (
-                                                <div key={block.id} className="relative group mt-16 mb-8">
-                                                    <h2 className="font-bold font-display-premium leading-tight" style={{ fontSize: `${parseFloat(fontSize) * 1.5}px` }}>
+                                                <div key={block.id} className="relative group mt-12 mb-6">
+                                                    <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.4}px` }}>
                                                         {highlightText(block.text, searchTerm)}
                                                     </h2>
-                                                    <button onClick={() => isBookmarked ? removeBookmark(block.id) : addBookmark(block.id, block.text)} className="absolute -left-16 top-1/2 -translate-y-1/2 p-3 opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
-                                                        {isBookmarked ? <BookmarkCheck className="w-6 h-6 text-blue-500" /> : <Bookmark className="w-6 h-6 opacity-30" />}
-                                                    </button>
                                                 </div>
                                             );
                                         }
-                                        return <p key={block.id} className="opacity-90 leading-relaxed mb-6">{highlightText(block.text, searchTerm)}</p>;
+                                        return (
+                                            <div key={block.id} className="reader-content-block opacity-90 mb-4" style={{ fontSize: `${fontSize}px` }}>
+                                                {highlightText(block.text, searchTerm)}
+                                            </div>
+                                        );
                                     })}
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="max-w-3xl mx-auto h-full flex items-center justify-center">
-                        <div className="w-full animate-in fade-in slide-in-from-right-8 duration-500 ease-out font-serif-premium space-y-8 text-justify">
-                            {pages[currentPageIndex]?.blocks.map((block) => {
-                                const isBookmarked = progress?.bookmarks?.find(b => b.id === block.id);
-                                if (block.type === 'heading') {
+                    <div className="max-w-4xl mx-auto h-full flex items-center justify-center p-4">
+                        <div className="page-sheet rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-20 w-full min-h-[80vh] animate-in fade-in zoom-in-95 duration-500 ease-out relative overflow-hidden">
+                            {/* Page Marker Overlay */}
+                            <div className="absolute top-8 right-12 opacity-20 text-[10px] uppercase tracking-[0.3em] font-bold pointer-events-none">
+                                Page {pages[currentPageIndex]?.number}
+                            </div>
+
+                            <div className="space-y-6">
+                                {pages[currentPageIndex]?.blocks.map((block) => {
+                                    if (block.type === 'heading') {
+                                        return (
+                                            <div key={block.id} className="relative group mt-12 mb-6">
+                                                <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.4}px` }}>
+                                                    {highlightText(block.text, searchTerm)}
+                                                </h2>
+                                            </div>
+                                        );
+                                    }
                                     return (
-                                        <div key={block.id} className="relative group mt-12 mb-8">
-                                            <h2 className="font-bold font-display-premium leading-tight" style={{ fontSize: `${parseFloat(fontSize) * 1.5}px` }}>
-                                                {highlightText(block.text, searchTerm)}
-                                            </h2>
-                                            <button onClick={() => isBookmarked ? removeBookmark(block.id) : addBookmark(block.id, block.text)} className="absolute -left-16 top-1/2 -translate-y-1/2 p-3 opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
-                                                {isBookmarked ? <BookmarkCheck className="w-6 h-6 text-blue-500" /> : <Bookmark className="w-6 h-6 opacity-30" />}
-                                            </button>
+                                        <div key={block.id} className="reader-content-block opacity-90 mb-4" style={{ fontSize: `${fontSize}px` }}>
+                                            {highlightText(block.text, searchTerm)}
                                         </div>
                                     );
-                                }
-                                return <p key={block.id} className="opacity-90 leading-relaxed mb-6">{highlightText(block.text, searchTerm)}</p>;
-                            })}
+                                })}
+                            </div>
                         </div>
                     </div>
                 )}

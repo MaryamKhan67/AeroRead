@@ -9,13 +9,11 @@ import io
 
 def clean_text(text):
     """
-    Clean the text by fixing broken line wraps that often happen in PDFs.
+    Clean the text while preserving critical layout information.
     """
-    # Remove hyphenated line break words
-    cleaned = re.sub(r'-\n', '', text)
-    # Replace single newline characters that aren't paragraph boundaries with spaces
-    cleaned = re.sub(r'(?<!\n)\n(?!\n)', ' ', cleaned)
-    # Return cleaned and stripped text
+    # Remove hyphenated line break words (e.g., "de- \nveloped" -> "developed")
+    cleaned = re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text)
+    # Return cleaned and stripped text, preserving internal line breaks
     return cleaned.strip()
 
 def process_pdf_file(filepath):
