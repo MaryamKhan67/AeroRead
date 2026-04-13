@@ -24,11 +24,12 @@
 }
 
 body {
-  @apply transition-colors duration-500 overflow-x-hidden;
+  transition: background-color 0.5s, color 0.5s;
   background-color: var(--reader-bg);
   color: var(--reader-text);
   font-family: var(--reader-font-sans);
   -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
 .font-serif-premium {
@@ -92,7 +93,9 @@ body {
 }
 
 .reader-content-block {
-  @apply whitespace-pre-wrap leading-[1.8] font-serif-premium;
+  white-space: pre-wrap;
+  line-height: 1.8;
+  font-family: var(--reader-font-serif);
   text-align: left;
 }
 
