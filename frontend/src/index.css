@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:wght@700&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --reader-bg: #ffffff;
+  --reader-text: #1a1a1a;
+  --reader-accent: #3b82f6;
+  --reader-font-serif: 'Lora', serif;
+  --reader-font-sans: 'Inter', sans-serif;
+  --reader-font-display: 'Playfair Display', serif;
+}
+
+.theme-dark {
+  --reader-bg: #121212;
+  --reader-text: #e0e0e0;
+  --reader-accent: #60a5fa;
+}
+
+.theme-sepia {
+  --reader-bg: #f4ecd8;
+  --reader-text: #5b4636;
+  --reader-accent: #8b5e3c;
+}
+
+body {
+  @apply transition-colors duration-500 overflow-x-hidden;
+  background-color: var(--reader-bg);
+  color: var(--reader-text);
+  font-family: var(--reader-font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-serif-premium {
+  font-family: var(--reader-font-serif);
+}
+
+.font-display-premium {
+  font-family: var(--reader-font-display);
+}
+
+/* Scrollbar tweaks */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.theme-dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile Nav and Safe Areas */
+.safe-area-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .max-w-3xl {
+    @apply max-w-full px-2;
+  }
+}
+
+/* Glassmorphism for mobile elements */
+.glass {
+  background: var(--reader-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(var(--reader-text), 0.05);
+}

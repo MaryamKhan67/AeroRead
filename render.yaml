@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: lumina-reader
+    env: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn --chdir backend app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: PORT
+        value: 10000
+    plan: free
