@@ -58,6 +58,11 @@ def upload_pdf():
 
     return jsonify({'error': 'Invalid file type'}), 400
 
+@app.route('/api/files/<path:filename>')
+def serve_pdf_file(filename):
+    """Serve the original PDF file to the frontend for canvas rendering."""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 if __name__ == '__main__':
     # Listen on all interfaces for local testing, Render will use environment variables
     port = int(os.environ.get('PORT', 5000))
