@@ -25,6 +25,10 @@ def static_proxy(path):
     # Otherwise, return the index.html (SPA routing)
     return send_from_directory(app.static_folder, 'index.html')
 
+@app.route('/static/extracted_images/<path:filename>')
+def serve_extracted_images(filename):
+    return send_from_directory('static/extracted_images', filename)
+
 @app.route('/api/upload', methods=['POST'])
 def upload_pdf():
     if 'file' not in request.files:
