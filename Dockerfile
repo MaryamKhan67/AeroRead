@@ -10,11 +10,14 @@ RUN npm run build
 FROM python:3.10-slim
 WORKDIR /app
 
-# Install system dependencies for Tesseract OCR and PyMuPDF
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     libtesseract-dev \
     libgl1-mesa-glx \
+    libsm6 \
+    libxext6 \
+    libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements and install
