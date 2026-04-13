@@ -43,12 +43,15 @@ def upload_pdf():
         file.save(filepath)
         
         try:
-            # Process the PDF using our anti-gravity engine
-            content = process_pdf_file(filepath)
+            # Generate metadata and ToC for the sidebar/reflow
+            data = process_pdf_file(filepath)
+            
+            # Build complete response including the URL to the raw file
             return jsonify({
-                'success': True,
-                'metadata': content.get('metadata', {}),
-                'content': content.get('blocks', [])
+                "success": True,
+                "filename": filename,
+                "fileUrl": f"/api/files/{filename}",
+                "data": data
             }), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500

@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
 import Uploader from './components/Uploader';
 import Reader from './components/Reader';
+import HybridReader from './components/HybridReader';
 import MobileNav from './components/MobileNav';
 import SettingsDrawer from './components/SettingsDrawer';
 import TOCSidebar from './components/TOCSidebar';
+import Toolbar from './components/Toolbar';
 import { Search, X, ChevronUp, ChevronDown } from 'lucide-react';
 
 function App() {
   const [readingData, setReadingData] = useState(null);
+  const [fileUrl, setFileUrl] = useState(null);
   const [theme, setTheme] = useState('light'); // light, dark, sepia
   const [fontSize, setFontSize] = useState(18); // default font size
   const [searchTerm, setSearchTerm] = useState('');
-  const [readingMode, setReadingMode] = useState('scroll'); // scroll or paginated
+  const [readingMode, setReadingMode] = useState('paginated'); // 'scroll' or 'paginated'
+  const [readingEngine, setReadingEngine] = useState('fidelity'); // 'fidelity' or 'reflow'
+  const [currentPage, setCurrentPage] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -23,9 +28,19 @@ function App() {
     document.body.className = `theme-${theme}`;
   }, [theme]);
 
-  const handleUploadSuccess = (data) => {
+  const handleUploadSuccess = (response) => {
+    // Response check based on backend upgrade
+    const data = response.data || response;
     setReadingData(data);
+    if (response.fileUrl) {
+      setFileUrl(response.fileUrl);
+    }
     setIsSidebarOpen(false);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (pageNum) => {
+    setCurrentPage(pageNum);
   };
 
   return (
@@ -45,7 +60,7 @@ function App() {
         </h1>
         {readingData && (
           <div className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-30 truncate ml-4 max-w-[150px]">
-            {readingData.metadata.title}
+            {readingData.metadata?.title || 'Untitled'}
           </div>
         )}
       </header>
@@ -87,41 +102,69 @@ function App() {
       <div className="flex flex-grow relative">
         {readingData && (
           <TOCSidebar
-            blocks={readingData.content}
+            blocks={readingData.blocks || readingData.content || []}
             isOpen={isSidebarOpen}
             setIsOpen={setIsSidebarOpen}
             theme={theme}
+            onSelectChapter={(id, pageNum) => {
+              if (pageNum) handlePageChange(pageNum);
+              setIsSidebarOpen(false);
+            }}
           />
         )}
 
         <main className="flex-grow flex flex-col relative w-full overflow-x-hidden">
-          <div className="w-full max-w-4xl mx-auto px-6 md:px-12 py-8">
+          <div className="w-full max-w-5xl mx-auto py-4">
             {!readingData ? (
-              <Uploader onUploadSuccess={handleUploadSuccess} />
+              <div className="max-w-4xl mx-auto px-6 md:px-12 py-8">
+                <Uploader onUploadSuccess={handleUploadSuccess} />
+              </div>
             ) : (
-              <Reader
-                data={readingData}
-                fontSize={fontSize}
-                letterSpacing={letterSpacing}
-                searchTerm={searchTerm}
-                readingMode={readingMode}
-                searchNavCommand={searchNavCommand}
-                onSearchNavComplete={() => setSearchNavCommand(null)}
-              />
+              readingEngine === 'fidelity' && fileUrl ? (
+                <HybridReader
+                  fileUrl={fileUrl}
+                  theme={theme}
+                  readingMode={readingMode}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                  zoom={100}
+                />
+              ) : (
+                <div className="max-w-4xl mx-auto px-6 md:px-12 py-8">
+                  <Reader
+                    data={readingData}
+                    fontSize={fontSize}
+                    letterSpacing={letterSpacing}
+                    searchTerm={searchTerm}
+                    readingMode={readingMode}
+                    searchNavCommand={searchNavCommand}
+                    onSearchNavComplete={() => setSearchNavCommand(null)}
+                  />
+                </div>
+              )
             )}
           </div>
         </main>
       </div>
 
-      {/* Mobile Navigation and Settings Drawer */}
+      {/* Navigation & Controls Overlay */}
       {readingData && (
         <>
-          <MobileNav
-            onOpenTOC={() => setIsSidebarOpen(true)}
-            onOpenSettings={() => setIsSettingsOpen(true)}
+          <Toolbar
+            onToggleSidebar={() => setIsSidebarOpen(true)}
+            onToggleSettings={() => setIsSettingsOpen(true)}
             onToggleSearch={() => setIsSearchActive(!isSearchActive)}
             isSearchActive={isSearchActive}
-            onHome={() => setReadingData(null)}
+            readingEngine={readingEngine}
+            setReadingEngine={setReadingEngine}
+          />
+
+          <MobileNav
+            readingMode={readingMode}
+            setReadingMode={setReadingMode}
+            currentPage={currentPage}
+            totalPages={data?.metadata?.page_count || readingData?.metadata?.page_count || 1}
+            onPageChange={handlePageChange}
           />
 
           <SettingsDrawer
@@ -144,4 +187,3 @@ function App() {
 }
 
 export default App;
-
