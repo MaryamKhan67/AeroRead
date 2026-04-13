@@ -36,7 +36,7 @@ export default function Reader({
     const searchMatches = useMemo(() => {
         if (!searchTerm.trim()) return [];
         return blocks
-            .filter(block => block.text.toLowerCase().includes(searchTerm.toLowerCase()))
+            .filter(block => block.text && block.text.toLowerCase().includes(searchTerm.toLowerCase()))
             .map(block => block.id);
     }, [blocks, searchTerm]);
 
@@ -83,7 +83,7 @@ export default function Reader({
 
     // Helper to highlight search matches
     const highlightText = (text, highlight, blockId) => {
-        if (!highlight.trim()) return text;
+        if (!text || !highlight.trim()) return text;
         const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
         const isActive = searchMatches[currentMatchIndex] === blockId;
 
@@ -112,7 +112,6 @@ export default function Reader({
     // Load initial progress
     useEffect(() => {
         if (progress && progress.scrollTop && !restored && readingMode === 'scroll') {
-            // Smoothly restore the scroll position after a tiny delay for layout
             setTimeout(() => {
                 window.scrollTo({ top: progress.scrollTop, behavior: 'auto' });
                 setRestored(true);
@@ -140,7 +139,7 @@ export default function Reader({
                 timeoutId = setTimeout(() => {
                     handleScroll();
                     timeoutId = null;
-                }, 1000); // Save every second of scrolling
+                }, 1000);
             }
         };
 
@@ -189,7 +188,7 @@ export default function Reader({
                 <div className="flex items-center justify-center gap-4 mt-6 text-xs uppercase tracking-[0.2em] font-medium opacity-40">
                     <span>{metadata.page_count} pages</span>
                     <span className="w-1 h-1 rounded-full bg-current"></span>
-                    <span>Anti-Gravity Layout</span>
+                    <span>Document Integrity Engine</span>
                 </div>
             </div>
 
@@ -206,18 +205,28 @@ export default function Reader({
                                 <div className="space-y-6">
                                     {page.blocks.map((block) => {
                                         const isBookmarked = progress?.bookmarks?.find(b => b.id === block.id);
+
+                                        if (block.type === 'image') {
+                                            return (
+                                                <div key={block.id} className="my-12 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
+                                                    <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[75vh]" loading="lazy" />
+                                                </div>
+                                            );
+                                        }
+
                                         if (block.type === 'heading') {
                                             return (
-                                                <div key={block.id} className="relative group mt-12 mb-6">
-                                                    <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.4}px` }}>
-                                                        {highlightText(block.text, searchTerm)}
+                                                <div id={block.id} key={block.id} className="relative group mt-14 mb-8">
+                                                    <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.5}px` }}>
+                                                        {highlightText(block.text, searchTerm, block.id)}
                                                     </h2>
                                                 </div>
                                             );
                                         }
+
                                         return (
-                                            <div key={block.id} className="reader-content-block opacity-90 mb-4" style={{ fontSize: `${fontSize}px` }}>
-                                                {highlightText(block.text, searchTerm)}
+                                            <div id={block.id} key={block.id} className="reader-content-block opacity-90 mb-6" style={{ fontSize: `${fontSize}px` }}>
+                                                {highlightText(block.text, searchTerm, block.id)}
                                             </div>
                                         );
                                     })}
@@ -227,26 +236,35 @@ export default function Reader({
                     </div>
                 ) : (
                     <div className="max-w-4xl mx-auto h-full flex items-center justify-center p-4">
-                        <div className="page-sheet rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-20 w-full min-h-[80vh] animate-in fade-in zoom-in-95 duration-500 ease-out relative overflow-hidden">
+                        <div className="page-sheet rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-20 w-full min-h-[85vh] animate-in fade-in zoom-in-95 duration-700 ease-out relative overflow-hidden flex flex-col">
                             {/* Page Marker Overlay */}
-                            <div className="absolute top-8 right-12 opacity-20 text-[10px] uppercase tracking-[0.3em] font-bold pointer-events-none">
+                            <div className="absolute top-10 right-14 opacity-20 text-[10px] uppercase tracking-[0.4em] font-bold pointer-events-none">
                                 Page {pages[currentPageIndex]?.number}
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-8 my-auto">
                                 {pages[currentPageIndex]?.blocks.map((block) => {
+                                    if (block.type === 'image') {
+                                        return (
+                                            <div key={block.id} className="my-8 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
+                                                <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[65vh] mx-auto" loading="lazy" />
+                                            </div>
+                                        );
+                                    }
+
                                     if (block.type === 'heading') {
                                         return (
-                                            <div key={block.id} className="relative group mt-12 mb-6">
-                                                <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.4}px` }}>
-                                                    {highlightText(block.text, searchTerm)}
+                                            <div id={block.id} key={block.id} className="relative group mt-12 mb-8">
+                                                <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.6}px` }}>
+                                                    {highlightText(block.text, searchTerm, block.id)}
                                                 </h2>
                                             </div>
                                         );
                                     }
+
                                     return (
-                                        <div key={block.id} className="reader-content-block opacity-90 mb-4" style={{ fontSize: `${fontSize}px` }}>
-                                            {highlightText(block.text, searchTerm)}
+                                        <div id={block.id} key={block.id} className="reader-content-block opacity-95 mb-4" style={{ fontSize: `${fontSize}px` }}>
+                                            {highlightText(block.text, searchTerm, block.id)}
                                         </div>
                                     );
                                 })}
@@ -284,5 +302,3 @@ export default function Reader({
         </div>
     );
 }
-
-
