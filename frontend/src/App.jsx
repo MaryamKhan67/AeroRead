@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import Uploader from './components/Uploader';
 import Reader from './components/Reader';
-import MobileNav from './components/MobileNav';
 import SettingsDrawer from './components/SettingsDrawer';
 import TOCSidebar from './components/TOCSidebar';
 import { Search, X, ChevronUp, ChevronDown } from 'lucide-react';
@@ -19,7 +18,6 @@ function App() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [letterSpacing, setLetterSpacing] = useState(0); // in px
   const [searchNavCommand, setSearchNavCommand] = useState(null);
-  const [isNavVisible, setIsNavVisible] = useState(true);
 
   useEffect(() => {
     // Apply theme class to document body for global transitions
@@ -92,15 +90,8 @@ function App() {
           />
         )}
 
-        <main
-          className="flex-grow flex flex-col relative w-full overflow-x-hidden cursor-pointer"
-          onClick={() => {
-            if (readingData && !isSidebarOpen && !isSettingsOpen && !isSearchActive) {
-              setIsNavVisible(v => !v);
-            }
-          }}
-        >
-          <div className="w-full max-w-5xl mx-auto py-4 cursor-default" onClick={e => e.stopPropagation()}>
+        <main className="flex-grow flex flex-col relative w-full overflow-x-hidden cursor-default">
+          <div className="w-full max-w-5xl mx-auto py-4">
             {!readingData ? (
               <div className="max-w-4xl mx-auto px-6 md:px-12 py-8">
                 <Uploader onUploadSuccess={handleUploadSuccess} />
@@ -125,19 +116,6 @@ function App() {
       {/* Navigation & Controls Overlay */}
       {readingData && (
         <>
-          <MobileNav
-            isVisible={isNavVisible}
-            readingMode={readingMode}
-            setReadingMode={setReadingMode}
-            currentPage={currentPage}
-            totalPages={readingData?.metadata?.page_count || 1}
-            onPageChange={handlePageChange}
-            onOpenTOC={() => setIsSidebarOpen(true)}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onToggleSearch={() => setIsSearchActive(!isSearchActive)}
-            isSearchActive={isSearchActive}
-            onHome={() => setReadingData(null)}
-          />
 
           <SettingsDrawer
             isOpen={isSettingsOpen}
