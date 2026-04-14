@@ -11,7 +11,6 @@ import 'react-pdf/dist/Page/TextLayer.css';
 export default function HybridReader({
     fileUrl,
     theme,
-    zoom: initialZoom,
     readingMode,
     currentPage,
     onPageChange,
@@ -20,11 +19,6 @@ export default function HybridReader({
     const [numPages, setNumPages] = useState(null);
     const [zoom, setZoom] = useState(1.0);
     const containerRef = useRef(null);
-
-    // Sync zoom from parent if needed
-    useEffect(() => {
-        if (initialZoom) setZoom(initialZoom / 100);
-    }, [initialZoom]);
 
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);

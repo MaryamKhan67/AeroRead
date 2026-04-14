@@ -46,6 +46,8 @@ def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
 
     for page_num in range(len(doc)):
         page = doc.load_page(page_num)
+        page_width = page.rect.width
+        page_height = page.rect.height
         
         # 1. Extract Images
         image_list = page.get_images(full=True)
@@ -60,11 +62,22 @@ def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
             with open(img_path, "wb") as f:
                 f.write(image_bytes)
             
+            # Find image location in page to get bbox
+            # This is simplified: it finds the first occurrence of the image xref on the page
+            img_bbox = [0, 0, 0, 0]
+            for img_info in page.get_image_info():
+                if img_info['xref'] == xref:
+                    img_bbox = list(img_info['bbox'])
+                    break
+
             blocks_result.append({
                 "id": f"img_{page_num}_{img_index}",
                 "type": "image",
                 "src": f"/static/extracted_images/{img_filename}",
-                "page": page_num + 1
+                "page": page_num + 1,
+                "bbox": img_bbox,
+                "pageWidth": page_width,
+                "pageHeight": page_height
             })
 
         # 2. Extract Text with High Fidelity
@@ -84,7 +97,10 @@ def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
                     "type": "paragraph",
                     "text": clean_text(ocr_text),
                     "page": page_num + 1,
-                    "is_ocr": True
+                    "is_ocr": True,
+                    "bbox": [50, 50, page_width - 50, page_height - 50], # OCR fallback bbox
+                    "pageWidth": page_width,
+                    "pageHeight": page_height
                 })
                 block_id_counter += 1
             continue
@@ -130,7 +146,9 @@ def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
                     "page": page_num + 1,
                     "fontSize": round(max_font_size, 1),
                     "is_bold": is_bold,
-                    "alignment": block.get("bbox", [0,0,0,0]) # Placeholder for potential layout math
+                    "bbox": list(block.get("bbox", [0, 0, 0, 0])),
+                    "pageWidth": page_width,
+                    "pageHeight": page_height
                 })
                 block_id_counter += 1
 

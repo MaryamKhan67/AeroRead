@@ -127,7 +127,6 @@ function App() {
                   readingMode={readingMode}
                   currentPage={currentPage}
                   onPageChange={handlePageChange}
-                  zoom={fontSize * 5.5} // Convert font-size scale (12-32) to zoom (66% - 176%)
                 />
               ) : (
                 <div className="max-w-4xl mx-auto px-6 md:px-12 py-8">
@@ -183,6 +182,7 @@ function App() {
             setLetterSpacing={setLetterSpacing}
             readingMode={readingMode}
             setReadingMode={setReadingMode}
+            readingEngine={readingEngine}
           />
         </>
       )}

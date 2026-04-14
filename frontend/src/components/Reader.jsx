@@ -204,19 +204,29 @@ export default function Reader({
 
                                 <div className="space-y-6">
                                     {page.blocks.map((block) => {
-                                        const isBookmarked = progress?.bookmarks?.find(b => b.id === block.id);
+                                        const { bbox, pageWidth } = block;
+                                        const style = {};
+
+                                        if (bbox && pageWidth) {
+                                            const [x0, y0, x1, y1] = bbox;
+                                            style.marginLeft = `${(x0 / pageWidth) * 100}%`;
+                                            style.width = `${((x1 - x0) / pageWidth) * 100}%`;
+                                            style.maxWidth = '100%';
+                                        }
 
                                         if (block.type === 'image') {
                                             return (
-                                                <div key={block.id} className="my-12 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
-                                                    <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[75vh]" loading="lazy" />
+                                                <div key={block.id} className="relative z-10" style={style}>
+                                                    <div className="my-12 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
+                                                        <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[75vh]" loading="lazy" />
+                                                    </div>
                                                 </div>
                                             );
                                         }
 
                                         if (block.type === 'heading') {
                                             return (
-                                                <div id={block.id} key={block.id} className="relative group mt-14 mb-8">
+                                                <div id={block.id} key={block.id} className="relative group mt-14 mb-8" style={style}>
                                                     <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.5}px` }}>
                                                         {highlightText(block.text, searchTerm, block.id)}
                                                     </h2>
@@ -225,7 +235,7 @@ export default function Reader({
                                         }
 
                                         return (
-                                            <div id={block.id} key={block.id} className="reader-content-block opacity-90 mb-6" style={{ fontSize: `${fontSize}px` }}>
+                                            <div id={block.id} key={block.id} className="reader-content-block opacity-90 mb-6" style={{ ...style, fontSize: `${fontSize}px` }}>
                                                 {highlightText(block.text, searchTerm, block.id)}
                                             </div>
                                         );
@@ -235,26 +245,46 @@ export default function Reader({
                         ))}
                     </div>
                 ) : (
-                    <div className="max-w-4xl mx-auto h-full flex items-center justify-center p-4">
-                        <div className="page-sheet rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-20 w-full min-h-[85vh] animate-in fade-in zoom-in-95 duration-700 ease-out relative overflow-hidden flex flex-col">
+                    <div className="max-w-4xl mx-auto h-full flex flex-col items-center justify-start p-4">
+                        <div
+                            className="page-sheet rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-20 w-full animate-in fade-in zoom-in-95 duration-700 ease-out relative overflow-hidden flex flex-col"
+                            style={{
+                                aspectRatio: pages[currentPageIndex]?.blocks[0]?.pageWidth ? `${pages[currentPageIndex].blocks[0].pageWidth} / ${pages[currentPageIndex].blocks[0].pageHeight}` : '1 / 1.41',
+                                minHeight: 'auto'
+                            }}
+                        >
                             {/* Page Marker Overlay */}
                             <div className="absolute top-10 right-14 opacity-20 text-[10px] uppercase tracking-[0.4em] font-bold pointer-events-none">
                                 Page {pages[currentPageIndex]?.number}
                             </div>
 
-                            <div className="space-y-8 my-auto">
+                            <div className="space-y-6 pt-4">
                                 {pages[currentPageIndex]?.blocks.map((block) => {
+                                    const { bbox, pageWidth } = block;
+                                    const style = {};
+
+                                    if (bbox && pageWidth) {
+                                        const [x0, y0, x1, y1] = bbox;
+                                        // Use horizontal absolute positioning relative to page width
+                                        // BUT use vertical flow (relative) to avoid overlap when text scales
+                                        style.marginLeft = `${(x0 / pageWidth) * 100}%`;
+                                        style.width = `${((x1 - x0) / pageWidth) * 100}%`;
+                                        style.maxWidth = '100%';
+                                    }
+
                                     if (block.type === 'image') {
                                         return (
-                                            <div key={block.id} className="my-8 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
-                                                <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[65vh] mx-auto" loading="lazy" />
+                                            <div key={block.id} className="relative z-10" style={style}>
+                                                <div className="my-6 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
+                                                    <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[65vh] mx-auto" loading="lazy" />
+                                                </div>
                                             </div>
                                         );
                                     }
 
                                     if (block.type === 'heading') {
                                         return (
-                                            <div id={block.id} key={block.id} className="relative group mt-12 mb-8">
+                                            <div id={block.id} key={block.id} className="relative group mt-12 mb-8" style={style}>
                                                 <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.6}px` }}>
                                                     {highlightText(block.text, searchTerm, block.id)}
                                                 </h2>
@@ -263,7 +293,7 @@ export default function Reader({
                                     }
 
                                     return (
-                                        <div id={block.id} key={block.id} className="reader-content-block opacity-95 mb-4" style={{ fontSize: `${fontSize}px` }}>
+                                        <div id={block.id} key={block.id} className="reader-content-block opacity-95 mb-4" style={{ ...style, fontSize: `${fontSize}px` }}>
                                             {highlightText(block.text, searchTerm, block.id)}
                                         </div>
                                     );
