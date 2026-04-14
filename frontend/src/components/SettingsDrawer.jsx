@@ -6,8 +6,7 @@ export default function SettingsDrawer({
     theme, setTheme,
     fontSize, setFontSize,
     letterSpacing, setLetterSpacing,
-    readingMode, setReadingMode,
-    readingEngine
+    readingMode, setReadingMode
 }) {
     if (!isOpen) return null;
 
@@ -46,34 +45,26 @@ export default function SettingsDrawer({
                         </div>
                     </section>
 
-                    {/* Font Size & Spacing - Only in Reader mode */}
-                    {readingEngine === 'reflow' ? (
-                        <section className="grid grid-cols-1 gap-10">
-                            <div className="flex flex-col items-center gap-4">
-                                <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-30">Text Size</p>
-                                <div className="flex items-center justify-between w-full px-4">
-                                    <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><ZoomOut className="w-6 h-6" /></button>
-                                    <span className="text-2xl font-display-premium">{fontSize}px</span>
-                                    <button onClick={() => setFontSize(Math.min(32, fontSize + 2))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><ZoomIn className="w-6 h-6" /></button>
-                                </div>
+                    {/* Font Size & Spacing */}
+                    <section className="grid grid-cols-1 gap-10">
+                        <div className="flex flex-col items-center gap-4">
+                            <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-30">Text Size</p>
+                            <div className="flex items-center justify-between w-full px-4">
+                                <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><ZoomOut className="w-6 h-6" /></button>
+                                <span className="text-2xl font-display-premium">{fontSize}px</span>
+                                <button onClick={() => setFontSize(Math.min(32, fontSize + 2))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><ZoomIn className="w-6 h-6" /></button>
                             </div>
+                        </div>
 
-                            <div className="flex flex-col items-center gap-4">
-                                <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-30">Comfort Spacing</p>
-                                <div className="flex items-center justify-between w-full px-4">
-                                    <button onClick={() => setLetterSpacing(Math.max(-1, letterSpacing - 0.5))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><Type className="w-4 h-4" /></button>
-                                    <span className="text-2xl font-display-premium">{letterSpacing}</span>
-                                    <button onClick={() => setLetterSpacing(Math.min(5, letterSpacing + 0.5))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><Type className="w-6 h-6" /></button>
-                                </div>
+                        <div className="flex flex-col items-center gap-4">
+                            <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-30">Comfort Spacing</p>
+                            <div className="flex items-center justify-between w-full px-4">
+                                <button onClick={() => setLetterSpacing(Math.max(-1, letterSpacing - 0.5))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><Type className="w-4 h-4" /></button>
+                                <span className="text-2xl font-display-premium">{letterSpacing}</span>
+                                <button onClick={() => setLetterSpacing(Math.min(5, letterSpacing + 0.5))} className="p-4 rounded-full bg-black/5 dark:bg-white/5"><Type className="w-6 h-6" /></button>
                             </div>
-                        </section>
-                    ) : (
-                        <section className="p-8 text-center bg-black/5 dark:bg-white/5 rounded-[2rem]">
-                            <p className="text-sm font-serif-premium italic opacity-50 leading-relaxed">
-                                Switch to <span className="font-bold">Reader Mode</span> for enhanced typography controls, dark mode optimization, and true text scaling.
-                            </p>
-                        </section>
-                    )}
+                        </div>
+                    </section>
 
                     {/* Themes */}
                     <section>

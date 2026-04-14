@@ -15,7 +15,6 @@ function App() {
   const [fontSize, setFontSize] = useState(18); // default font size
   const [searchTerm, setSearchTerm] = useState('');
   const [readingMode, setReadingMode] = useState('paginated'); // 'scroll' or 'paginated'
-  const [readingEngine, setReadingEngine] = useState('fidelity'); // 'fidelity' or 'reflow'
   const [currentPage, setCurrentPage] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -120,27 +119,17 @@ function App() {
                 <Uploader onUploadSuccess={handleUploadSuccess} />
               </div>
             ) : (
-              readingEngine === 'fidelity' && fileUrl ? (
-                <HybridReader
-                  fileUrl={fileUrl}
-                  theme={theme}
+              <div className="max-w-4xl mx-auto px-6 md:px-12 py-8">
+                <Reader
+                  data={readingData}
+                  fontSize={fontSize}
+                  letterSpacing={letterSpacing}
+                  searchTerm={searchTerm}
                   readingMode={readingMode}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
+                  searchNavCommand={searchNavCommand}
+                  onSearchNavComplete={() => setSearchNavCommand(null)}
                 />
-              ) : (
-                <div className="max-w-4xl mx-auto px-6 md:px-12 py-8">
-                  <Reader
-                    data={readingData}
-                    fontSize={fontSize}
-                    letterSpacing={letterSpacing}
-                    searchTerm={searchTerm}
-                    readingMode={readingMode}
-                    searchNavCommand={searchNavCommand}
-                    onSearchNavComplete={() => setSearchNavCommand(null)}
-                  />
-                </div>
-              )
+              </div>
             )}
           </div>
         </main>
@@ -149,15 +138,6 @@ function App() {
       {/* Navigation & Controls Overlay */}
       {readingData && (
         <>
-          <Toolbar
-            onToggleSidebar={() => setIsSidebarOpen(true)}
-            onToggleSettings={() => setIsSettingsOpen(true)}
-            onToggleSearch={() => setIsSearchActive(!isSearchActive)}
-            isSearchActive={isSearchActive}
-            readingEngine={readingEngine}
-            setReadingEngine={setReadingEngine}
-          />
-
           <MobileNav
             readingMode={readingMode}
             setReadingMode={setReadingMode}
@@ -182,7 +162,6 @@ function App() {
             setLetterSpacing={setLetterSpacing}
             readingMode={readingMode}
             setReadingMode={setReadingMode}
-            readingEngine={readingEngine}
           />
         </>
       )}
