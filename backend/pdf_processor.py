@@ -13,16 +13,27 @@ import unicodedata
 def clean_text(text):
     """
     Precision cleaning of text while preserving Unicode integrity and layout.
+    Strips hidden characters injected by PDF link annotations / ToUnicode CMaps.
     """
     if not text:
         return ""
-    
+
     # Normalize Unicode characters (fixes some 'corrupted' symbol issues)
     text = unicodedata.normalize('NFKC', text)
-    
+
+    # Strip Private-Use Area characters (U+E000–U+F8FF, U+F0000–U+FFFFF, U+100000–U+10FFFF)
+    # PDF link annotations often inject PUA glyphs that look like symbols.
+    text = re.sub(r'[\uE000-\uF8FF\U000F0000-\U000FFFFF\U00100000-\U0010FFFF]', '', text)
+
+    # Strip zero-width and other invisible formatting characters
+    text = re.sub(r'[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]', '', text)
+
+    # Strip non-printable ASCII control characters (keep \n and \t)
+    text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', text)
+
     # Remove hyphenated line break words (e.g., "de- \nveloped" -> "developed")
     cleaned = re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text)
-    
+
     return cleaned.strip()
 
 def process_pdf_file(filepath, output_dir="uploads/images"):
