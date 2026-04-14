@@ -6,9 +6,9 @@ export default function Reader({
     data, fontSize, letterSpacing, searchTerm, readingMode,
     searchNavCommand, onSearchNavComplete
 }) {
-    const { metadata, content } = data;
-    const blocks = content || [];
-    const documentId = metadata.title || 'untitled-document';
+    const { metadata, blocks: contentBlocks } = data;
+    const blocks = contentBlocks || [];
+    const documentId = metadata?.title || 'untitled-document';
 
     // Group blocks by their original page number
     const pages = useMemo(() => {
@@ -202,23 +202,13 @@ export default function Reader({
                                     Page {page.number}
                                 </div>
 
-                                <div className="space-y-6">
+                                <div className="space-y-6 pt-4 max-w-2xl mx-auto">
                                     {page.blocks.map((block) => {
-                                        const { bbox, pageWidth } = block;
-                                        const style = {};
-
-                                        if (bbox && pageWidth) {
-                                            const [x0, y0, x1, y1] = bbox;
-                                            style.marginLeft = `${(x0 / pageWidth) * 100}%`;
-                                            style.width = `${((x1 - x0) / pageWidth) * 100}%`;
-                                            style.maxWidth = '100%';
-                                        }
-
                                         if (block.type === 'image') {
                                             return (
-                                                <div key={block.id} className="relative z-10" style={style}>
-                                                    <div className="my-12 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
-                                                        <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[75vh]" loading="lazy" />
+                                                <div key={block.id} className="relative z-10 w-full flex justify-center py-6">
+                                                    <div className="rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2 max-w-full">
+                                                        <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[60vh]" loading="lazy" />
                                                     </div>
                                                 </div>
                                             );
@@ -226,7 +216,7 @@ export default function Reader({
 
                                         if (block.type === 'heading') {
                                             return (
-                                                <div id={block.id} key={block.id} className="relative group mt-14 mb-8" style={style}>
+                                                <div id={block.id} key={block.id} className="relative group mt-12 mb-6">
                                                     <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.5}px` }}>
                                                         {highlightText(block.text, searchTerm, block.id)}
                                                     </h2>
@@ -235,7 +225,7 @@ export default function Reader({
                                         }
 
                                         return (
-                                            <div id={block.id} key={block.id} className="reader-content-block opacity-90 mb-6" style={{ ...style, fontSize: `${fontSize}px` }}>
+                                            <div id={block.id} key={block.id} className="reader-content-block opacity-90 mb-6 font-serif-premium leading-relaxed" style={{ fontSize: `${fontSize}px` }}>
                                                 {highlightText(block.text, searchTerm, block.id)}
                                             </div>
                                         );
@@ -258,25 +248,13 @@ export default function Reader({
                                 Page {pages[currentPageIndex]?.number}
                             </div>
 
-                            <div className="space-y-6 pt-4">
+                            <div className="space-y-6 pt-4 max-w-2xl mx-auto">
                                 {pages[currentPageIndex]?.blocks.map((block) => {
-                                    const { bbox, pageWidth } = block;
-                                    const style = {};
-
-                                    if (bbox && pageWidth) {
-                                        const [x0, y0, x1, y1] = bbox;
-                                        // Use horizontal absolute positioning relative to page width
-                                        // BUT use vertical flow (relative) to avoid overlap when text scales
-                                        style.marginLeft = `${(x0 / pageWidth) * 100}%`;
-                                        style.width = `${((x1 - x0) / pageWidth) * 100}%`;
-                                        style.maxWidth = '100%';
-                                    }
-
                                     if (block.type === 'image') {
                                         return (
-                                            <div key={block.id} className="relative z-10" style={style}>
-                                                <div className="my-6 rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2">
-                                                    <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[65vh] mx-auto" loading="lazy" />
+                                            <div key={block.id} className="relative z-10 w-full flex justify-center py-6">
+                                                <div className="rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-gray-900/30 p-2 max-w-full">
+                                                    <img src={block.src} alt="Document illustration" className="w-full h-auto object-contain max-h-[60vh]" loading="lazy" />
                                                 </div>
                                             </div>
                                         );
@@ -284,8 +262,8 @@ export default function Reader({
 
                                     if (block.type === 'heading') {
                                         return (
-                                            <div id={block.id} key={block.id} className="relative group mt-12 mb-8" style={style}>
-                                                <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.6}px` }}>
+                                            <div id={block.id} key={block.id} className="relative group mt-12 mb-6">
+                                                <h2 className="font-bold font-display-premium leading-tight tracking-tight text-left" style={{ fontSize: `${parseFloat(fontSize) * 1.5}px` }}>
                                                     {highlightText(block.text, searchTerm, block.id)}
                                                 </h2>
                                             </div>
@@ -293,7 +271,7 @@ export default function Reader({
                                     }
 
                                     return (
-                                        <div id={block.id} key={block.id} className="reader-content-block opacity-95 mb-4" style={{ ...style, fontSize: `${fontSize}px` }}>
+                                        <div id={block.id} key={block.id} className="reader-content-block opacity-90 mb-6 font-serif-premium leading-relaxed" style={{ fontSize: `${fontSize}px` }}>
                                             {highlightText(block.text, searchTerm, block.id)}
                                         </div>
                                     );
