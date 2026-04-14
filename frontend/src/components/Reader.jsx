@@ -235,15 +235,13 @@ export default function Reader({
                         ))}
                     </div>
                 ) : (
-                    <div className="max-w-4xl mx-auto h-full flex flex-col items-center justify-start p-4">
+                    /* ── Paginated mode: auto-height card, content never clips ── */
+                    <div className="max-w-4xl mx-auto flex flex-col items-center p-4 pb-36">
                         <div
-                            className="page-sheet rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-20 w-full animate-in fade-in zoom-in-95 duration-700 ease-out relative overflow-hidden flex flex-col"
-                            style={{
-                                aspectRatio: pages[currentPageIndex]?.blocks[0]?.pageWidth ? `${pages[currentPageIndex].blocks[0].pageWidth} / ${pages[currentPageIndex].blocks[0].pageHeight}` : '1 / 1.41',
-                                minHeight: 'auto'
-                            }}
+                            className="page-sheet rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-20 w-full animate-in fade-in zoom-in-95 duration-700 ease-out relative"
+                            style={{ minHeight: 'auto' }}
                         >
-                            {/* Page Marker Overlay */}
+                            {/* Page label */}
                             <div className="absolute top-10 right-14 opacity-20 text-[10px] uppercase tracking-[0.4em] font-bold pointer-events-none">
                                 Page {pages[currentPageIndex]?.number}
                             </div>
