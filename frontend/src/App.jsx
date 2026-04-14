@@ -3,7 +3,7 @@ import Uploader from './components/Uploader';
 import Reader from './components/Reader';
 import SettingsDrawer from './components/SettingsDrawer';
 import TOCSidebar from './components/TOCSidebar';
-import { Search, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Search, X, ChevronUp, ChevronDown, Settings2, Sun, Moon, Coffee, Type, ZoomIn, ZoomOut } from 'lucide-react';
 
 function App() {
   const [readingData, setReadingData] = useState(null);
@@ -18,6 +18,7 @@ function App() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [letterSpacing, setLetterSpacing] = useState(0); // in px
   const [searchNavCommand, setSearchNavCommand] = useState(null);
+  const [isQuickSettingsOpen, setIsQuickSettingsOpen] = useState(false);
 
   useEffect(() => {
     // Apply theme class to document body for global transitions
@@ -116,6 +117,72 @@ function App() {
       {/* Navigation & Controls Overlay */}
       {readingData && (
         <>
+
+          {/* ── Floating Quick Settings Pill ── */}
+          <div className="fixed top-5 right-5 z-50 flex flex-col items-end gap-2">
+            {/* Toggle Button */}
+            <button
+              onClick={() => setIsQuickSettingsOpen(o => !o)}
+              className={`p-3 rounded-full shadow-xl backdrop-blur-md border border-current/10 transition-all duration-300
+                ${theme === 'dark' ? 'bg-gray-800/90 text-white' : theme === 'sepia' ? 'bg-[#f4ecd8]/90 text-[#4a3621]' : 'bg-white/90 text-gray-800'}
+                ${isQuickSettingsOpen ? 'rotate-45 scale-90' : 'hover:scale-110'}`}
+              aria-label="Reading Settings"
+            >
+              <Settings2 className="w-5 h-5" />
+            </button>
+
+            {/* Expanded Settings Panel */}
+            <div className={`flex flex-col gap-2 items-end transition-all duration-400 origin-top-right
+              ${isQuickSettingsOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-75 pointer-events-none'}`}>
+
+              {/* Font Size */}
+              <div className={`flex items-center gap-1 p-1.5 rounded-2xl shadow-xl backdrop-blur-md border border-current/10
+                ${theme === 'dark' ? 'bg-gray-800/90 text-white' : theme === 'sepia' ? 'bg-[#f4ecd8]/90 text-[#4a3621]' : 'bg-white/90 text-gray-800'}`}>
+                <button
+                  onClick={() => setFontSize(s => Math.max(12, s - 2))}
+                  className="p-2 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                  aria-label="Decrease font size"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <span className="text-xs font-bold w-8 text-center opacity-60">{fontSize}</span>
+                <button
+                  onClick={() => setFontSize(s => Math.min(32, s + 2))}
+                  className="p-2 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                  aria-label="Increase font size"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Theme Switcher */}
+              <div className={`flex items-center gap-1 p-1.5 rounded-2xl shadow-xl backdrop-blur-md border border-current/10
+                ${theme === 'dark' ? 'bg-gray-800/90 text-white' : theme === 'sepia' ? 'bg-[#f4ecd8]/90 text-[#4a3621]' : 'bg-white/90 text-gray-800'}`}>
+                <button
+                  onClick={() => setTheme('light')}
+                  className={`p-2 rounded-xl transition-colors ${theme === 'light' ? 'bg-orange-100 text-orange-500' : 'hover:bg-black/10 opacity-40'}`}
+                  aria-label="Light theme"
+                >
+                  <Sun className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setTheme('sepia')}
+                  className={`p-2 rounded-xl transition-colors ${theme === 'sepia' ? 'bg-amber-100 text-amber-700' : 'hover:bg-black/10 opacity-40'}`}
+                  aria-label="Sepia theme"
+                >
+                  <Coffee className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setTheme('dark')}
+                  className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-blue-900 text-blue-300' : 'hover:bg-black/10 opacity-40'}`}
+                  aria-label="Dark theme"
+                >
+                  <Moon className="w-4 h-4" />
+                </button>
+              </div>
+
+            </div>
+          </div>
 
           <SettingsDrawer
             isOpen={isSettingsOpen}
