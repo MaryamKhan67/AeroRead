@@ -10,22 +10,46 @@ import unicodedata
 # Optional: Configure tesseract path if it's not in the PATH
 # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
+def _is_encoding_artifact(text):
+    """
+    Detect if text is a PDF font encoding artifact:
+    Latin characters mixed with Indic/CJK/Arabic indicates a wrong ToUnicode CMap.
+    e.g.  "C□ൺ൭ൻaൾc 1" should really be "Chapter 1"
+    """
+    has_latin = bool(re.search(r'[A-Za-z]', text))
+    # Malayalam, Devanagari, Bengali, Tamil, Telugu, Kannada, Sinhala, Thai, Myanmar
+    has_indic = bool(re.search(
+        r'[\u0900-\u0DFF\u0E00-\u0FFF\u1000-\u109F\u1780-\u17FF]', text))
+    # CJK unified ideographs and Hangul
+    has_cjk   = bool(re.search(r'[\u3000-\u9FFF\uAC00-\uD7AF]', text))
+    # Arabic / Hebrew
+    has_rtl   = bool(re.search(r'[\u0600-\u08FF\u0590-\u05FF]', text))
+    # Geometric substitution glyphs (box characters □ etc.)
+    has_box   = bool(re.search(r'[\u25A0-\u25FF\u2580-\u259F]', text))
+
+    return has_latin and (has_indic or has_cjk or has_rtl or has_box)
+
+
 def clean_text(text):
     """
     Precision cleaning of text while preserving Unicode integrity and layout.
-    Strips hidden characters injected by PDF link annotations / ToUnicode CMaps.
+    Auto-strips mixed-script encoding artifacts caused by bad PDF ToUnicode CMaps.
     """
     if not text:
         return ""
 
-    # Normalize Unicode characters (fixes some 'corrupted' symbol issues)
+    # Normalize Unicode
     text = unicodedata.normalize('NFKC', text)
 
-    # Strip Private-Use Area characters (U+E000–U+F8FF, U+F0000–U+FFFFF, U+100000–U+10FFFF)
-    # PDF link annotations often inject PUA glyphs that look like symbols.
-    text = re.sub(r'[\uE000-\uF8FF\U000F0000-\U000FFFFF\U00100000-\U0010FFFF]', '', text)
+    # If Latin text is mixed with Indic/CJK/Arabic it is a font encoding artifact —
+    # strip everything outside printable ASCII to recover the readable characters.
+    if _is_encoding_artifact(text):
+        text = re.sub(r'[^\x20-\x7E]', '', text)
 
-    # Strip zero-width and other invisible formatting characters
+    # Strip Private-Use Area characters (PDF link ToUnicode CMap artifacts)
+    text = re.sub(r'[\uE000-\uF8FF]', '', text)
+
+    # Strip zero-width / invisible formatting characters
     text = re.sub(r'[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]', '', text)
 
     # Strip non-printable ASCII control characters (keep \n and \t)
@@ -35,6 +59,7 @@ def clean_text(text):
     cleaned = re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text)
 
     return cleaned.strip()
+
 
 def process_pdf_file(filepath, output_dir="uploads/images"):
     """
