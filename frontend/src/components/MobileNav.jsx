@@ -1,6 +1,7 @@
 import { Menu, Search, Type, Home, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function MobileNav({
+    isVisible = true,
     onOpenTOC,
     onOpenSettings,
     onToggleSearch,
@@ -12,7 +13,7 @@ export default function MobileNav({
     readingMode
 }) {
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-black/5 dark:border-white/10 flex flex-col gap-4 safe-area-bottom shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+        <nav className={`fixed bottom-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-black/5 dark:border-white/10 flex flex-col gap-4 safe-area-bottom shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
 
             {/* Progress Bar (Subtle) */}
             <div className="w-full h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">

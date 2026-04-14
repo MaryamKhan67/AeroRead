@@ -19,6 +19,7 @@ function App() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [letterSpacing, setLetterSpacing] = useState(0); // in px
   const [searchNavCommand, setSearchNavCommand] = useState(null);
+  const [isNavVisible, setIsNavVisible] = useState(true);
 
   useEffect(() => {
     // Apply theme class to document body for global transitions
@@ -42,25 +43,6 @@ function App() {
 
   return (
     <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${theme === 'dark' ? 'dark text-white' : ''} ${readingData ? 'pb-24' : ''}`}>
-
-      {/* Mini Header */}
-      <header className={`px-6 py-4 flex justify-between items-center sticky top-0 z-50 transition-colors duration-300 backdrop-blur-md border-b border-current/5
-        ${theme === 'dark' ? 'bg-gray-900/80' : theme === 'sepia' ? 'bg-[#f4ecd8]/80' : 'bg-white/80'}`}>
-        <h1
-          className="text-xl font-bold font-display-premium tracking-tight cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => {
-            setReadingData(null);
-            setIsSearchActive(false);
-          }}
-        >
-          AeroRead
-        </h1>
-        {readingData && (
-          <div className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-30 truncate ml-4 max-w-[150px]">
-            {readingData.metadata?.title || 'Untitled'}
-          </div>
-        )}
-      </header>
 
       {/* Global Search Overlay (Mobile Style) */}
       {isSearchActive && readingData && (
@@ -110,8 +92,15 @@ function App() {
           />
         )}
 
-        <main className="flex-grow flex flex-col relative w-full overflow-x-hidden">
-          <div className="w-full max-w-5xl mx-auto py-4">
+        <main
+          className="flex-grow flex flex-col relative w-full overflow-x-hidden cursor-pointer"
+          onClick={() => {
+            if (readingData && !isSidebarOpen && !isSettingsOpen && !isSearchActive) {
+              setIsNavVisible(v => !v);
+            }
+          }}
+        >
+          <div className="w-full max-w-5xl mx-auto py-4 cursor-default" onClick={e => e.stopPropagation()}>
             {!readingData ? (
               <div className="max-w-4xl mx-auto px-6 md:px-12 py-8">
                 <Uploader onUploadSuccess={handleUploadSuccess} />
@@ -137,6 +126,7 @@ function App() {
       {readingData && (
         <>
           <MobileNav
+            isVisible={isNavVisible}
             readingMode={readingMode}
             setReadingMode={setReadingMode}
             currentPage={currentPage}
