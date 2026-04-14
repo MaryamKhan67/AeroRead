@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import Uploader from './components/Uploader';
 import Reader from './components/Reader';
-import HybridReader from './components/HybridReader';
 import MobileNav from './components/MobileNav';
 import SettingsDrawer from './components/SettingsDrawer';
 import TOCSidebar from './components/TOCSidebar';
-import Toolbar from './components/Toolbar';
 import { Search, X, ChevronUp, ChevronDown } from 'lucide-react';
 
 function App() {
