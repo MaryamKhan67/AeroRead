@@ -54,6 +54,9 @@ def upload_pdf():
                 "data": data
             }), 200
         except Exception as e:
+            import traceback
+            print("ERROR during PDF processing:")
+            traceback.print_exc()
             return jsonify({'error': str(e)}), 500
 
     return jsonify({'error': 'Invalid file type'}), 400

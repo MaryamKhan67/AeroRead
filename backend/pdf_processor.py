@@ -63,12 +63,14 @@ def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
                 f.write(image_bytes)
             
             # Find image location in page to get bbox
-            # This is simplified: it finds the first occurrence of the image xref on the page
             img_bbox = [0, 0, 0, 0]
-            for img_info in page.get_image_info():
-                if img_info['xref'] == xref:
-                    img_bbox = list(img_info['bbox'])
-                    break
+            try:
+                for img_info in page.get_image_info():
+                    if img_info.get('xref') == xref:
+                        img_bbox = list(img_info['bbox'])
+                        break
+            except Exception as e:
+                print(f"Warning: Could not get image info for xref {xref}: {e}")
 
             blocks_result.append({
                 "id": f"img_{page_num}_{img_index}",
@@ -87,22 +89,25 @@ def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
         page_has_text = any(b.get("type") == 0 for b in page_dict.get("blocks", []))
         
         if not page_has_text:
-            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
-            img_data = pix.tobytes("png")
-            img = Image.open(io.BytesIO(img_data))
-            ocr_text = pytesseract.image_to_string(img)
-            if ocr_text.strip():
-                blocks_result.append({
-                    "id": f"block_{block_id_counter}",
-                    "type": "paragraph",
-                    "text": clean_text(ocr_text),
-                    "page": page_num + 1,
-                    "is_ocr": True,
-                    "bbox": [50, 50, page_width - 50, page_height - 50], # OCR fallback bbox
-                    "pageWidth": page_width,
-                    "pageHeight": page_height
-                })
-                block_id_counter += 1
+            try:
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+                img_data = pix.tobytes("png")
+                img = Image.open(io.BytesIO(img_data))
+                ocr_text = pytesseract.image_to_string(img)
+                if ocr_text.strip():
+                    blocks_result.append({
+                        "id": f"block_{block_id_counter}",
+                        "type": "paragraph",
+                        "text": clean_text(ocr_text),
+                        "page": page_num + 1,
+                        "is_ocr": True,
+                        "bbox": [50, 50, page_width - 50, page_height - 50],
+                        "pageWidth": page_width,
+                        "pageHeight": page_height
+                    })
+                    block_id_counter += 1
+            except Exception as e:
+                print(f"Warning: OCR failed on page {page_num+1}: {e}")
             continue
 
         for block in page_dict.get("blocks", []):
