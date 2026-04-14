@@ -25,7 +25,7 @@ def clean_text(text):
     
     return cleaned.strip()
 
-def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
+def process_pdf_file(filepath, output_dir="uploads/images"):
     """
     Extract text and images from a PDF with strict layout integrity.
     Hierarchy: Page > Block > Line > Span
@@ -75,7 +75,7 @@ def process_pdf_file(filepath, output_dir="backend/static/extracted_images"):
             blocks_result.append({
                 "id": f"img_{page_num}_{img_index}",
                 "type": "image",
-                "src": f"/static/extracted_images/{img_filename}",
+                "src": f"/api/files/images/{img_filename}",
                 "page": page_num + 1,
                 "bbox": img_bbox,
                 "pageWidth": page_width,
